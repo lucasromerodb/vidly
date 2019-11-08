@@ -17,6 +17,17 @@ app.get("/api/genres", (req, res) => {
   res.send(genres);
 });
 
+app.get("/api/genres/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const genre = genres.find(i => i.id === id);
+  // Look up (if not existing return 404 - not found)
+  if (!genre) {
+    return res.status(404).send("Género no encontrado");
+  }
+
+  res.send(genre);
+})
+
 app.post("/api/genres", (req, res) => {
   // validate
   const { error } = validateGenre(req.body);
@@ -43,7 +54,7 @@ app.put("/api/genres/:id", (req, res) => {
   }
 
   // Send (return updated)
-  genre.genre = req.body.name;
+  genre.genre = req.body.genre;
   res.send(genre);
 });
 
@@ -68,8 +79,8 @@ app.delete("/api/genres/:id", (req, res) => {
 function validateGenre(genre) {
   const schema = {
     genre: Joi.string()
-      .min(3)
-      .required()
+        .min(3)
+        .required()
   };
 
   return Joi.validate(genre, schema);
