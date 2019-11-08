@@ -7,6 +7,11 @@
     "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -16,5 +21,8 @@
     "express": "^4.17.1",
     "helmet": "^3.21.2",
     "morgan": "^1.9.1"
+  },
+  "devDependencies": {
+    "husky": "^3.0.9"
   }
 }
