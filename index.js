@@ -1,9 +1,29 @@
+const config = require("config");
+const helmet = require("helmet");
+const morgan = require("morgan");
+const Joi = require("@hapi/joi");
+const logger = require("./logger.js");
 const express = require("express");
 const app = express();
 
-const Joi = require("@hapi/joi");
-
 app.use(express.json());
+app.use(express.urlencoded({ extend: true }));
+app.use(express.static("public"));
+app.use(helmet()); // Helps secure your apps by setting various HTTP headers.
+
+console.log("App name:", config.get("name"));
+console.log("Mail server:", config.get("mail.host"));
+
+if (app.get("env") === "development") {
+  app.use(morgan("tiny")); // HTTP request logger.
+  console.log("Morgan enabled...");
+}
+app.use(logger);
+
+app.use(function(req, res, next) {
+  console.log("Authenticating...");
+  next();
+});
 
 const genres = [
   { id: 1, genre: "sports" },
@@ -26,7 +46,7 @@ app.get("/api/genres/:id", (req, res) => {
   }
 
   res.send(genre);
-})
+});
 
 app.post("/api/genres", (req, res) => {
   // validate
@@ -79,8 +99,8 @@ app.delete("/api/genres/:id", (req, res) => {
 function validateGenre(genre) {
   const schema = {
     genre: Joi.string()
-        .min(3)
-        .required()
+      .min(3)
+      .required()
   };
 
   return Joi.validate(genre, schema);
