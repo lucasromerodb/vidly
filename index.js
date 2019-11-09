@@ -1,3 +1,5 @@
+const debug = require("debug")("vidly:startup");
+const dbDebugger = require("debug")("vidly:db");
 const config = require("config");
 const helmet = require("helmet");
 const morgan = require("morgan");
@@ -17,8 +19,9 @@ console.log("Mail password:", config.get("mail.password"));
 
 if (app.get("env") === "development") {
   app.use(morgan("tiny")); // HTTP request logger.
-  console.log("Morgan enabled...");
+  debug("Morgan enabled...");
 }
+
 app.use(logger);
 
 app.use(function(req, res, next) {

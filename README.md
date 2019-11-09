@@ -16,11 +16,10 @@ Password
 export vidly_password=1234
 ```
 
-Debug
+Debug logs
 
 ```shell script
 export DEBUG=vidly:startup
-export DEBUG=vidly:db
 ```
 
 ## Start project
