@@ -8,6 +8,9 @@ const logger = require("./logger.js");
 const express = require("express");
 const app = express();
 
+app.set("view engine", "pug");
+app.set("views", "./views");
+
 app.use(express.json());
 app.use(express.urlencoded({ extend: true }));
 app.use(express.static("public"));
@@ -36,6 +39,10 @@ const genres = [
 ];
 
 // --- endpoints ---
+
+app.get("/", (req, res) => {
+  res.render("index", { title: "Vidly", message: "Welcome to Vidly" });
+});
 
 app.get("/api/genres", (req, res) => {
   res.send(genres);
