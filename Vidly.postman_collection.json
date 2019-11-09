@@ -58,6 +58,36 @@
 			"response": []
 		},
 		{
+			"name": "post a genre (url encoded)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"genre\": \"thriller\"\n}"
+				},
+				"url": {
+					"raw": "localhost:3000/api/genres",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"genres"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "put a genre",
 			"request": {
 				"method": "PUT",
