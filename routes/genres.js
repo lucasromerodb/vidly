@@ -1,20 +1,32 @@
 const Joi = require("@hapi/joi");
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 
-const genres = [
-  { id: 1, genre: "sports" },
-  { id: 2, genre: "action" },
-  { id: 3, genre: "adventure" }
-];
+// create schema
+// create instance
 
-router.get("/", (req, res) => {
+const courseSchema = new mongoose.Schema({
+  genre: { type: String, minlength: 3, maxlength: 50, trim: true, required: true }
+});
+
+const Genre = mongoose.model("Genre", courseSchema);
+
+// const genres = [
+//   { id: 1, genre: "sports" },
+//   { id: 2, genre: "action" },
+//   { id: 3, genre: "adventure" }
+// ];
+
+router.get("/", async (req, res) => {
+  const genres = await Genre.find().sort("name");
   res.send(genres);
 });
 
-router.get("/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const genre = genres.find(i => i.id === id);
+router.get("/:id", async (req, res) => {
+  const id = req.params.id;
+  const genre = await Genre.findById(id);
+
   // Look up (if not existing return 404 - not found)
   if (!genre) {
     return res.status(404).send("Género no encontrado");
@@ -23,48 +35,46 @@ router.get("/:id", (req, res) => {
   res.send(genre);
 });
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   // validate
   const { error } = validateGenre(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   // Send
-  const newGenre = { id: genres.length + 1, genre: req.body.genre };
-  genres.push(newGenre);
-  res.send(genres);
+  let newGenre = new Genre({ genre: req.body.genre });
+
+  newGenre = await newGenre.save();
+
+  res.send(newGenre);
 });
 
-router.put("/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const genre = genres.find(i => i.id === id);
+router.put("/:id", async (req, res) => {
+  // validate (if invalid return 400 - bad request)
+  const isValid = validateGenre(req.body.genre);
+  if (!isValid) {
+    return res.status(400).send(isValid.details[0].message);
+  }
+
+  const id = req.params.id;
+  const genre = await Genre.findByIdAndUpdate(id, { genre: req.body.genre }, { new: true });
+
   // Look up (if not existing return 404 - not found)
   if (!genre) {
     return res.status(404).send("Género no encontrado");
   }
 
-  // validate (if invalid return 400 - bad request)
-  const isValid = validateGenre(req.body);
-  if (!isValid) {
-    return res.status(400).send(isValid.details[0].message);
-  }
-
   // Send (return updated)
-  genre.genre = req.body.genre;
   res.send(genre);
 });
 
-router.delete("/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const genre = genres.find(i => i.id === id);
+router.delete("/:id", async (req, res) => {
+  const id = req.params.id;
+  const genre = await Genre.findByIdAndRemove(id);
 
   // look up
   if (!genre) {
     return res.status(404).send("Género no encontrado");
   }
-
-  // delete
-  const index = genres.indexOf(genre);
-  genres.splice(index, 1);
 
   // send
   res.send(genres);
@@ -73,7 +83,7 @@ router.delete("/:id", (req, res) => {
 function validateGenre(genre) {
   const schema = {
     genre: Joi.string()
-      .min(3)
+      .min(5)
       .required()
   };
 
